@@ -1,9 +1,10 @@
 import './App.css';
+import Body from './Components/Body';
 
 function App() {
   return (
     <div className=" bg-slate-300">
-      Hello There
+      <Body />
     </div>
   );
 }
