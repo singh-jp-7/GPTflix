@@ -1,10 +1,14 @@
-import './App.css';
-import Body from './Components/Body';
+import { Provider } from "react-redux";
+import "./App.css";
+import Body from "./Components/Body";
+import appStore from "./Utils/appStore";
 
 function App() {
   return (
     <div className=" bg-slate-300">
-      <Body />
+      <Provider store={appStore}>
+        <Body />
+      </Provider>
     </div>
   );
 }
