@@ -1,16 +1,20 @@
 import { useState, useRef } from "react";
 import { BG_URL } from "../Utils/Constants";
-import Netlix_Logo from "../Images/Netflix_Logo_PMS.png";
 import { checkValidData } from "../Utils/validate";
 import {
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
+  signInWithEmailAndPassword, updateProfile 
 } from "firebase/auth";
 import { auth } from "../Utils/firebase";
 import { useNavigate } from "react-router-dom";
+import Header from "./Header";
+import { useDispatch, useSelector } from "react-redux";
+import { addUser } from "../Utils/userSlice";
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector(state => state.user);
   const [isSignUp, setIsSignUp] = useState(false);
   const [errormessage, setErrorMessage] = useState(null);
 
@@ -27,7 +31,24 @@ const Login = () => {
         .then((userCredential) => {
           // Signed up
           const user = userCredential.user;
-          navigate("/browse");
+          updateProfile(auth.currentUser, {
+            displayName: nameValue, photoURL: ""
+          }).then(() => {
+            navigate("/browse");
+            const { uid, email, displayName, photoURL } = auth.currentUser;
+            dispatch(
+              addUser({
+                uid: uid,
+                email: email,
+                displayName: displayName,
+                photoURL: "",
+              })
+            );
+            // ...
+          }).catch((error) => {
+            // An error occurred
+            // ...
+          });
           // ...
         })
         .catch((error) => {
@@ -57,11 +78,7 @@ const Login = () => {
 
   return (
     <div className="relative flex">
-      <img
-        className=" absolute w-36 bg-gradient-to-bl"
-        src={Netlix_Logo}
-        alt="LOGO"
-      ></img>
+      <Header className="absolute" />
       <form
         className="flex flex-col absolute bg-black opacity-85 w-3/12 my-44 mx-[550px] p-12 rounded-lg"
         onSubmit={(e) => e.preventDefault()}
