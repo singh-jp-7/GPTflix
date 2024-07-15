@@ -1,14 +1,32 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Netlix_Logo from "../Images/Netflix_Logo_PMS.png";
 import Netlix_avatar from "../Images/Netflix_avatar.png";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { auth } from "../Utils/firebase";
 import { signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
+import { onAuthStateChanged } from "firebase/auth";
+import { addUser, removeUser } from "../Utils/userSlice";
 
 const Header = () => {
   const user = useSelector(state => state.user);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const { uid, email, displayName } = user;
+        dispatch(addUser({ uid: uid, email: email, displayName: displayName }));
+        navigate("/browse")
+      } else {
+        dispatch(removeUser());
+        navigate("/");
+      }
+    });
+
+    // CleanUp after component Unmount 
+    return () => unsubscribe();
+  }, []);
   const signOutUser = () => {
     signOut(auth).then(() => {
       navigate('/')
@@ -30,7 +48,7 @@ const Header = () => {
         src={Netlix_avatar}
         alt="Avatar"
       ></img>
-      <button onClick={signOutUser}>Sign Out: {user?.displayName}</button>
+      <button className="text-white" onClick={signOutUser}>Sign Out: {user?.displayName}</button>
       </div>}
     </div>
   );

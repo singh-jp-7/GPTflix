@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { BG_URL } from "../Utils/Constants";
 import { checkValidData } from "../Utils/validate";
 import {
@@ -18,6 +18,14 @@ const Login = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [errormessage, setErrorMessage] = useState(null);
 
+  // Form fields persist on toggling, reset on form type change
+  useEffect(()=> {
+    if (name?.current?.value) name.current.value = ''
+    if (email?.current?.value) email.current.value = ''
+    if (password?.current?.value) password.current.value =''
+  }, [isSignUp])
+
+  //Handles sign Up and sign In Authentication
   const handleButtonclick = () => {
     const nameValue = name?.current?.value;
     const emailValue = email?.current?.value;
@@ -34,20 +42,18 @@ const Login = () => {
           updateProfile(auth.currentUser, {
             displayName: nameValue, photoURL: ""
           }).then(() => {
-            navigate("/browse");
             const { uid, email, displayName, photoURL } = auth.currentUser;
             dispatch(
               addUser({
                 uid: uid,
                 email: email,
                 displayName: displayName,
-                photoURL: "",
+                photoURL: photoURL,
               })
             );
             // ...
           }).catch((error) => {
-            // An error occurred
-            // ...
+            navigate("/error");
           });
           // ...
         })
@@ -61,7 +67,6 @@ const Login = () => {
         .then((userCredential) => {
           // Signed in
           const user = userCredential.user;
-          navigate("/browse");
           // ...
         })
         .catch((error) => {
