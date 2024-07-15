@@ -2,8 +2,6 @@ import React from "react";
 import MovieCard from "./MovieCard";
 
 const MovieList = ({ title, movies }) => {
-  console.log("Movies", movies?.[0]);
-
   return (
     <div className="">
       <div className="p-6 text-white">
